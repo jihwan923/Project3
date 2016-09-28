@@ -3,11 +3,11 @@
  * <Student1 Name>
  * <Student1 EID>
  * <Student1 5-digit Unique No.>
- * <Student2 Name>
- * <Student2 EID>
+ * Kevin Liang
+ * kgl392
  * <Student2 5-digit Unique No.>
  * Slip days used: <0>
- * Git URL:
+ * Git URL: https://github.com/jihwan923/Project3.git
  * Fall 2016
  */
 
@@ -18,18 +18,19 @@ import java.io.*;
 
 public class Main {
 	
-	// static variables and constants only here.
+	//static variables and constants only here.
 	//public static ArrayList<String> inputDictionary;
-	public static ArrayDeque<String> inputDictionary;
+	public static Set<String> inputDictionary;
+	public static ArrayList<String> dict;
 	//public static Set<String> visitedWords;
 	//public static Set<String> visitedWords;
 	public static String startWord;
 	public static String endWord;
-	public static char[] endArray;
-	public static ArrayList<String> ladder;
+	//public static char[] endArray;
+	//public static ArrayList<String> ladder;
 	
 	public static void main(String[] args) throws Exception {
-		
+		/*
 		Scanner kb;	// input Scanner for commands
 		PrintStream ps;	// output file
 		// If arguments are specified, read/write from/to files instead of Std IO.
@@ -50,17 +51,30 @@ public class Main {
 			ArrayList<String> ladder = getWordLadderDFS(userInput.get(0), userInput.get(1));
 			printLadder(ladder);
 		}
-		// TODO methods to read in words, output ladder
+		*/
+		initialize();
+		for(int i = 0; i < inputDictionary.size(); i++){
+			for(int j = 0; j < inputDictionary.size(); j++){
+				if (dict.get(i) != dict.get(j)){
+					startWord = dict.get(i);
+					endWord = dict.get(j);
+					ArrayList<String> ladder = getWordLadderDFS(dict.get(i), dict.get(j));
+					printLadder(ladder);
+				}
+			}
+		}
 	}
 	
 	public static void initialize() {
 		// initialize your static variables or constants here.
 		// We will call this method before running our JUNIT tests.  So call it 
 		// only once at the start of main.
-		Set<String> tempDict = makeDictionary();
-		inputDictionary = new ArrayDeque<String>(tempDict);
-		endArray = endWord.toCharArray();
-		ladder = new ArrayList<String>();
+		//Set<String> tempDict = makeDictionary();
+		inputDictionary = makeDictionary();
+		dict = new ArrayList<String>(inputDictionary);
+				//new HashSet<String>();
+		//endArray = endWord.toCharArray();
+		//ladder = new ArrayList<String>();
 		 
 	}
 	
@@ -90,7 +104,15 @@ public class Main {
 	
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
 		Set<String> visitedWords = new HashSet<String>();
-		ArrayList<String> resultLadder = getWordLadderDFS(start, end, visitedWords);
+		ArrayList<String> resultLadder;
+		try{
+			resultLadder = getWordLadderDFS(start, end, visitedWords);
+		}
+		catch(StackOverflowError e){
+			resultLadder = getWordLadderDFS(end, start, visitedWords);
+		}
+		
+		//ArrayList<String> resultLadder = getWordLadderDFS(start, end, visitedWords);
 		return resultLadder;
 	}
 	
@@ -113,12 +135,12 @@ public class Main {
 		int j = 0;
 		char tempChar;
 		
-		for(j = 0; j < endArray.length; j++){ // then try other characters
+		for(j = 0; j < end.length(); j++){ // then try other characters
 			tempChar = charArray[j];
-			if(charArray[j] != endArray[j]){
-				charArray[j] = endArray[j];
+			if(charArray[j] != end.charAt(j)){
+				charArray[j] = end.charAt(j);
 			
-				String potentialWord = String.valueOf(charArray);
+				String potentialWord = new String(charArray);
 				
 				if (!visitedWords.contains(potentialWord)){
 					if (inputDictionary.contains(potentialWord)){
@@ -144,7 +166,7 @@ public class Main {
 				if(charArray[i] != ch){
 					charArray[i] = ch;
 
-					String potentialWord = String.valueOf(charArray);
+					String potentialWord = new String(charArray);
 					
 					if (!visitedWords.contains(potentialWord)){
 					//if (inputDictionary.contains(potentialWord) && !visitedWords.contains(potentialWord)){
@@ -242,9 +264,9 @@ public class Main {
 		else{
 			int ladderCount = ladder.size() - 2;
 			System.out.println("a " + ladderCount + "-rung word ladder exists between " + startWord.toLowerCase() + " and " + endWord.toLowerCase() + ".");
-			for (int i = 0; i < ladder.size(); i++){
+			/*for (int i = 0; i < ladder.size(); i++){
 				System.out.println(ladder.get(i).toLowerCase());
-			}
+			}*/
 		}
 	}
 	// TODO
