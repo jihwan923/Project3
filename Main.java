@@ -3,9 +3,9 @@
  * Jihwan Lee
  * jl54387
  * 16445
- * <Student2 Name>
- * <Student2 EID>
- * <Student2 5-digit Unique No.>
+ * Kevin Liang
+ * kgl392
+ * 16445
  * Slip days used: <0>
  * Git URL: https://github.com/jihwan923/Project3
  * Fall 2016
@@ -40,7 +40,7 @@ public class Main {
 		if (!userInput.isEmpty()){ 
 			startWord = userInput.get(0);
 			endWord = userInput.get(1);
-			ArrayList<String> ladder = getWordLadderDFS(userInput.get(0), userInput.get(1));
+			ArrayList<String> ladder = getWordLadderBFS(userInput.get(0), userInput.get(1));
 			printLadder(ladder);
 		}
 	}
@@ -115,8 +115,10 @@ public class Main {
 	  * @return return word ladder result if there is a path from start word to end word
 	  */
     public static ArrayList<String> getWordLadderBFS(String start, String end) {
-		Set<String> visitedWords = new HashSet<String>();
+		Set<String> visitedWords = new HashSet<String>(); // visited word list will be kept so there will not be a loop
 		ArrayList<String> ladderResult =  new ArrayList<String>();
+		char tempChar;
+		char ch;
 		
 		if (start.equals(end)){ // return an empty ladder if start word and end word are same
 			return ladderResult;
@@ -124,30 +126,29 @@ public class Main {
 		
 		Queue<ArrayList<String>> wordQueue = new ArrayDeque<ArrayList<String>>(); // create a FIFO queue 
 		ArrayList<String> initialLadder = new ArrayList<String>();
-		int i = 0;
+		int letterPosition = 0;
 		
 		initialLadder.add(start); // start with the starting word
 		wordQueue.add(initialLadder); // place the initial starting word to the queue
 		visitedWords.add(start); // indicate that start word was visited
 		
 		while(!wordQueue.isEmpty()){ // queue will become empty when there is no more words left to progress
-			ArrayList<String> topLadder = (ArrayList<String>)wordQueue.remove();
+			ArrayList<String> topLadder = (ArrayList<String>)wordQueue.remove(); // remove and set the current ladder that is being tested
 			
 			String lastString = topLadder.get(topLadder.size() - 1); // get the latest string from the queue ladder
-			
 			if (lastString.equals(end)){ // if end word is reached, return the ladder with the path
 				return topLadder;
 			}
 			
 			char[] charArray = lastString.toCharArray(); // convert the string to character arrays
 			
-			i = 0;
-			while(i < charArray.length){ // this loop adds every possible one-letter difference word in the level to the queue
-				for(char ch = 'A'; ch <= 'Z'; ch++){
-					char tempChar = charArray[i];
+			
+			for(letterPosition = 0; letterPosition < charArray.length; letterPosition++){ // this loop adds every possible one-letter difference word in the level to the queue
+				for(ch = 'A'; ch <= 'Z'; ch++){
+					tempChar = charArray[letterPosition];
 					
-					if(charArray[i] != ch){ // be sure new character array results in different word
-						charArray[i] = ch;
+					if(charArray[letterPosition] != ch){ // be sure new character array results in different word
+						charArray[letterPosition] = ch;
 					}
 					
 					String potentialWord = new String(charArray); // create a new word using the character array
@@ -163,16 +164,19 @@ public class Main {
 							visitedWords.add(potentialWord); // add the word to visited list 
 						}
 					}
-					
-					charArray[i] = tempChar; // revert back to the original char array
+					charArray[letterPosition] = tempChar; // revert back to the original char array
 				}
-				i += 1;
 			}
 		}
 		
 		return ladderResult; // return an empty list if there is no path from start to end
 	}
     
+    /**
+	  * Make a dictionary from the input file.
+	  * @param nothing is passed in
+	  * @return return a set of dictionary words if input file exists
+	  */
 	public static Set<String>  makeDictionary () {
 		Set<String> words = new HashSet<String>();
 		Scanner infile = null;
@@ -189,16 +193,25 @@ public class Main {
 		return words;
 	}
 	
+	/**
+	  * Prints out the result ladder from BFS or DFS word ladder search.
+	  * @param ladder is the result ladder from BFS or DFS search
+	  * @return nothing is returned
+	  */
 	public static void printLadder(ArrayList<String> ladder) {
-		if (ladder.isEmpty()){
-			System.out.println("no word ladder can be found between " + startWord.toLowerCase() + " and " + endWord.toLowerCase() + ".");
+		if (ladder.isEmpty()){ // if the ladder is empty, output that there is no ladder
+			System.out.print("no word ladder can be found between " + startWord.toLowerCase());
+			System.out.print(" and " + endWord.toLowerCase() + ".");
+			System.out.println();
 		}
-		else{
+		else{ // if ladder exists, print out the ladder and its length
 			int ladderCount = ladder.size() - 2;
-			System.out.println("a " + ladderCount + "-rung word ladder exists between " + startWord.toLowerCase() + " and " + endWord.toLowerCase() + ".");
-			/*for (int i = 0; i < ladder.size(); i++){
+			System.out.print("a " + ladderCount + "-rung word ladder exists between ");
+			System.out.print(startWord.toLowerCase() + " and " + endWord.toLowerCase() + ".");
+			System.out.println();
+			for (int i = 0; i < ladder.size(); i++){
 				System.out.println(ladder.get(i).toLowerCase());
-			}*/
+			}
 		}
 	}
 	
@@ -249,7 +262,7 @@ public class Main {
 			charArray[j] = tempChar;
 		}
 		
-		for (i = 0; i < charArray.length; i++){ // try other characters and positions if previous loop didn't work
+		for (i = 0; i < charArray.length; i++){ // try other characters and positions if previous loop's words didn't work
 			for(char ch = 'A'; ch <= 'Z'; ch++){ 
 				tempChar = charArray[i];
 				if(charArray[i] != ch){
